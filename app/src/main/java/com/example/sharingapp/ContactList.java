@@ -17,7 +17,7 @@ import java.util.ArrayList;
 /**
  * ContactList class
  */
-public class ContactList {
+public class ContactList extends Observable {
 
     private static ArrayList<Contact> contacts;
     private String FILENAME = "contacts.sav";
@@ -28,40 +28,61 @@ public class ContactList {
 
     public void setContacts(ArrayList<Contact> contact_list) {
         contacts = contact_list;
+        notifyObservers();
     }
 
     public ArrayList<Contact> getContacts() {
         return contacts;
     }
 
-    public ArrayList<String> getAllUsernames() {
-        ArrayList<String> usernames = new ArrayList<String>();
-        for (Contact i: contacts) {
-            usernames.add(i.getUsername());
-        }
-        return usernames;
+    public ArrayList<String> getAllUsernames(){
+        ArrayList<String> username_list = new ArrayList<String>();
+        for (Contact c : contacts){
+            username_list.add(c.getUsername());
+            }
+        return username_list;
     }
 
     public void addContact(Contact contact) {
         contacts.add(contact);
+        notifyObservers();
     }
 
     public void deleteContact(Contact contact) {
         contacts.remove(contact);
+        notifyObservers();
     }
 
-    public Contact getContact(Integer index) {
+    public Contact getContact(int index) {
         return contacts.get(index);
     }
 
-    public Integer getSize() {
+    public int getSize() {
         return contacts.size();
     }
 
-    public Integer getIndex(Contact contact) {
+    public Contact getContactByUsername(String username){
+        for (Contact c : contacts){
+            if (c.getUsername().equals(username)){
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public boolean hasContact(Contact contact) {
+        for (Contact c : contacts) {
+            if (contact.getId().equals(c.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int getIndex(Contact contact) {
         int pos = 0;
-        for (Contact i : contacts) {
-            if (contact.getId().equals(i.getId())) {
+        for (Contact c : contacts) {
+            if (contact.getId().equals(c.getId())) {
                 return pos;
             }
             pos = pos+1;
@@ -69,21 +90,8 @@ public class ContactList {
         return -1;
     }
 
-    public Boolean hasContact(Contact contact) {
-        return (getIndex(contact) >= 0);
-    }
-
-    public Contact getContactByUsername(String username) {
-        Contact contact = null;
-        for (Contact i : contacts) {
-            if (username.equals(i.getUsername())) {
-                return i;
-            }
-        }
-        return contact;
-    }
-
     public void loadContacts(Context context) {
+
         try {
             FileInputStream fis = context.openFileInput(FILENAME);
             InputStreamReader isr = new InputStreamReader(fis);
@@ -96,9 +104,14 @@ public class ContactList {
         } catch (IOException e) {
             contacts = new ArrayList<Contact>();
         }
+        notifyObservers();
     }
 
-    public void saveContacts(Context context) {
+    /**
+     * @param context
+     * @return true: if save is successful, false: if save is unsuccessful
+     */
+    public boolean saveContacts(Context context) {
         try {
             FileOutputStream fos = context.openFileOutput(FILENAME, 0);
             OutputStreamWriter osw = new OutputStreamWriter(fos);
@@ -108,13 +121,20 @@ public class ContactList {
             fos.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            return false;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
-    public Boolean isUsernameAvailable(String username) {
-        return (getContactByUsername(username) == null);
+    public boolean isUsernameAvailable(String username){
+        for (Contact u : contacts) {
+            if (u.getUsername().equals(username)) {
+                return false;
+            }
+        }
+        return true;
     }
-
 }

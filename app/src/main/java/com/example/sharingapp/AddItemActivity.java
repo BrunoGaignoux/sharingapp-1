@@ -27,71 +27,55 @@ public class AddItemActivity extends AppCompatActivity {
     private int REQUEST_CODE = 1;
 
     private ItemList item_list = new ItemList();
+    private ItemListController item_list_controller = new ItemListController(item_list);
+
     private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_add_item);
 
-        title = (EditText) findViewById(R.id.title);
-        maker = (EditText) findViewById(R.id.maker);
-        description = (EditText) findViewById(R.id.description);
-        length = (EditText) findViewById(R.id.length);
-        width = (EditText) findViewById(R.id.width);
-        height = (EditText) findViewById(R.id.height);
-        photo = (ImageView) findViewById(R.id.image_view);
+        title = findViewById(R.id.title);
+        maker = findViewById(R.id.maker);
+        description = findViewById(R.id.description);
+        length = findViewById(R.id.length);
+        width = findViewById(R.id.width);
+        height = findViewById(R.id.height);
+        photo = findViewById(R.id.image_view);
 
         photo.setImageResource(android.R.drawable.ic_menu_gallery);
 
         context = getApplicationContext();
-        item_list.loadItems(context);
+        item_list_controller.loadItems(context);
     }
 
     public void saveItem (View view) {
 
-        String title_str = title.getText().toString();
-        String maker_str = maker.getText().toString();
-        String description_str = description.getText().toString();
-        String length_str = length.getText().toString();
-        String width_str = width.getText().toString();
-        String height_str = height.getText().toString();
-
-        if (title_str.equals("")) {
-            title.setError("Empty field!");
+        if (!validateInput()) {
             return;
         }
 
-        if (maker_str.equals("")) {
-            maker.setError("Empty field!");
+        Item item = new Item(
+                title.getText().toString(),
+                maker.getText().toString(),
+                description.getText().toString(),
+                image,
+                null);
+
+        ItemController item_controller = new ItemController(item);
+        item_controller.setDimensions(
+                length.getText().toString(),
+                width.getText().toString(),
+                height.getText().toString()
+        );
+
+        // Add item
+        boolean success = item_list_controller.addItem(item, context);
+        if (!success) {
             return;
         }
-
-        if (description_str.equals("")) {
-            description.setError("Empty field!");
-            return;
-        }
-
-        if (length_str.equals("")) {
-            length.setError("Empty field!");
-            return;
-        }
-
-        if (width_str.equals("")) {
-            width.setError("Empty field!");
-            return;
-        }
-
-        if (height_str.equals("")) {
-            height.setError("Empty field!");
-            return;
-        }
-
-        Dimensions dimensions = new Dimensions(length_str, width_str, height_str);
-        Item item = new Item(title_str, maker_str, description_str, dimensions, image, null );
-
-        item_list.addItem(item);
-        item_list.saveItems(context);
 
         // End AddItemActivity
         Intent intent = new Intent(this, MainActivity.class);

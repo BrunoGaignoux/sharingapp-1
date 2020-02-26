@@ -12,6 +12,8 @@ import android.widget.EditText;
 public class AddContactActivity extends AppCompatActivity {
 
     private ContactList contact_list = new ContactList();
+    private ContactListController contact_list_controller = new ContactListController(contact_list);
+
     private Context context;
 
     private EditText username;
@@ -22,11 +24,11 @@ public class AddContactActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_contact);
 
-        username = (EditText) findViewById(R.id.username);
-        email = (EditText) findViewById(R.id.email);
+        username = findViewById(R.id.username);
+        email = findViewById(R.id.email);
 
         context = getApplicationContext();
-        contact_list.loadContacts(context);
+        contact_list_controller.loadContacts(context);
     }
 
     public void saveContact(View view) {
@@ -39,28 +41,25 @@ public class AddContactActivity extends AppCompatActivity {
             return;
         }
 
-        if (email_str.equals("")) {
-            email.setError("Empty field!");
-            return;
-        }
-
-        if (!email_str.contains("@")){
+        if (!email_str.contains("@")) {
             email.setError("Must be an email address!");
             return;
         }
 
-        if (!contact_list.isUsernameAvailable(username_str)){
+        if (!contact_list_controller.isUsernameAvailable(username_str)){
             username.setError("Username already taken!");
             return;
         }
 
         Contact contact = new Contact(username_str, email_str, null);
 
-        contact_list.addContact(contact);
-        contact_list.saveContacts(context);
+        // Add contact
+        boolean success = contact_list_controller.addContact(contact, context);
+        if (!success) {
+            return;
+        }
 
         // End AddContactActivity
         finish();
     }
 }
-

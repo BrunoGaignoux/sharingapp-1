@@ -11,10 +11,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 /**
- * ContactAdapter is responsible setting for what information is displayed in ListView entries.
+ * ContactAdapter is responsible for what information is displayed in ListView entries.
  */
 public class ContactAdapter extends ArrayAdapter<Contact> {
-
     private LayoutInflater inflater;
     private Context context;
 
@@ -27,21 +26,22 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        // getItem(position) gets the "contact" at "position" in the "contacts" ArrayList
+        // getItem(position) gets the contact ("contact") at "position" in the "contacts" ArrayList
         // (where "contacts" is a parameter in the ContactAdapter creator as seen above ^^)
         Contact contact = getItem(position);
+        ContactController contact_controller = new ContactController(contact);
 
-        String username = "Username: " + contact.getUsername();
-        String email = "Email: " + contact.getEmail();
+        String username = "Username: " + contact_controller.getUsername();
+        String email = "Email: " + contact_controller.getEmail();
 
         // Check if an existing view is being reused, otherwise inflate the view.
         if (convertView == null) {
-            convertView = inflater.from(context).inflate(R.layout.contactlist_contact, parent, false);
+            convertView = LayoutInflater.from(context).inflate(R.layout.contactlist_contact, parent, false);
         }
 
-        TextView username_tv = (TextView) convertView.findViewById(R.id.username_tv);
-        TextView email_tv = (TextView) convertView.findViewById(R.id.email_tv);
-        ImageView photo = (ImageView) convertView.findViewById(R.id.contacts_image_view);
+        TextView username_tv = convertView.findViewById(R.id.username_tv);
+        TextView email_tv = convertView.findViewById(R.id.email_tv);
+        ImageView photo = convertView.findViewById(R.id.contacts_image_view);
 
         photo.setImageResource(android.R.drawable.ic_menu_gallery);
 

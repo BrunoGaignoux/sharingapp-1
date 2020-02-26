@@ -30,10 +30,4 @@ public class Dimensions {
     public String getDimensions() {
         return length + " x " + width + " x " + height;
     }
-
-    public void setDimensions(String length, String width, String height) {
-        this.length = length;
-        this.width = width;
-        this.height = height;
-    }
 }
